@@ -30,6 +30,7 @@ Please execute the following commands to install the necessary libraries:
 
 ```bash
 pip install -r requirements.txt
+```bash
 
 Please ensure that all the libraries are successfully installed before proceeding.
 
