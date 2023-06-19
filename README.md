@@ -14,7 +14,7 @@ The prediction is obtained by applying the audio tagging system on consecutive s
 
 This software is based on the AI4S demo created as part of the AI4S project at the University of Surrey. If you use our work, please consider citing us:
 
-[1] Gabriel Bibbo, Arshdeep Singh, Mark D. Plumbley. "Audio Tagging on an Embedded Hardware Platform" arXiv preprint arXiv:2306.09106 (2023).
+[1] Gabriel Bibbó, Arshdeep Singh, Mark D. Plumbley. "Audio Tagging on an Embedded Hardware Platform" arXiv preprint arXiv:2306.09106 (2023).
 
 Paper: https://arxiv.org/abs/2306.09106
 
