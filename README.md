@@ -2,7 +2,7 @@
 
 Embedded general purpose, real-time sound recognition demo:
 
-![demo screenshot](assets/AI4S embedded.png)
+![demo screenshot](assets/AI4S_embedded.png)
 
 Welcome to our project's GitHub repository! Our work focuses on exploring the potential of audio event recognition using convolutional neural networks on edge devices, like Raspberry Pi, aiming to achieve real-time audio analysis and classification.
 
