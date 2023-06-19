@@ -1,0 +1,161 @@
+<!-- This file creates a web page that displays the detected sound events and temperature values.
+
+For it to work correctly from the Raspberry Pi with Raspbian installed, follow this steps
+
+STEP 1: UPDATE YOUR SYSTEM
+1. Open Terminal on your Raspberry Pi.
+2. Run the following commands to update your system:
+    sudo apt-get update
+    sudo apt-get upgrade
+
+STEP 2: INSTALL APACHE
+1. Run the following command to install Apache:
+    sudo apt-get install apache2 -y
+
+STEP 3: INSTALL PHP
+1. Run the following command to install PHP:
+    sudo apt-get install php -y
+
+STEP 4: TEST APACHE
+1. Open a web browser and enter your Raspberry Pi's IP address.
+2. If Apache is working correctly, you should see a default Apache page.
+
+STEP 5: LOCATE HTML DIRECTORY
+1. The default directory for your website is /var/www/html. 
+2. You can replace the default file with this index.html file.
+
+STEP 6: ACCESS THE WEBPAGE
+1. You can access the new webpage by entering the Raspberry Pi's IP address in a web browser.
+
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafico de Sonidos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <h1>Sound confidence graph</h1>
+        <h2 id="temperatureDisplay">Temperature: --</h2>
+    </div>
+    <canvas id="soundChart"></canvas>
+
+    <script>
+        let chart;
+
+        async function fetchJSONData() {
+            try {
+                const response = await fetch("sound_datalog.json");
+                const jsonData = await response.json();
+                return jsonData;
+            } catch (error) {
+                console.error("Error al cargar el archivo JSON:", error);
+                return [];
+            }
+        }
+
+        async function fetchTemperatureData() {
+            try {
+                const response = await fetch("temperature_log.json");
+                const jsonData = await response.json();
+                return jsonData;
+            } catch (error) {
+                console.error("Error al cargar el archivo JSON de temperatura:", error);
+                return [];
+            }
+        }
+
+        function calculateTotalConfidence(jsonData) {
+            const soundStats = {};
+
+            jsonData.forEach(frame => {
+                frame.sounds.forEach(sound => {
+                    if (!soundStats[sound.label]) {
+                        soundStats[sound.label] = { sum: 0, count: 0 };
+                    }
+                    soundStats[sound.label].sum += sound.confidence;
+                    soundStats[sound.label].count += 1;
+                });
+            });
+
+            return Object.entries(soundStats).map(([label, stats]) => {
+                return { label, total: stats.sum };
+            });
+        }
+
+        async function plotSoundData() {
+            const jsonData = await fetchJSONData();
+            console.log(jsonData);
+
+            if (jsonData.length === 0) {
+                console.error("No hay datos disponibles para graficar.");
+                return;
+            }
+
+            const last100Data = jsonData.slice(-100);
+            const labels = last100Data.map(data => data.timestamp);
+            const sortedSoundLabels = calculateTotalConfidence(last100Data).sort((a, b) => b.total - a.total).slice(0, 7).map(entry => entry.label);
+            const datasets = sortedSoundLabels.map(label => {
+                return {
+                    label: label,
+                    data: last100Data.map(data => {
+                        const sound = data.sounds.find(sound => sound.label === label);
+                        return sound ? sound.confidence : 0;
+                    }),
+                    borderWidth: 1
+                };
+            });
+
+            const ctx = document.getElementById('soundChart').getContext('2d');
+            if (chart) {
+                chart.destroy();
+            }
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        async function updateTemperatureDisplay() {
+            const temperatureData = await fetchTemperatureData();
+            const lastTemperature = temperatureData[temperatureData.length - 1];
+
+            if (lastTemperature) {
+                document.getElementById('temperatureDisplay').textContent = `Temperature: ${lastTemperature.temperature}°C`;
+            } else {
+                document.getElementById('temperatureDisplay').textContent = "Temperature: --";
+            }
+        }
+
+        async function updateChartAndTemperature() {
+            await plotSoundData();
+            await updateTemperatureDisplay();
+            setTimeout(updateChartAndTemperature, 500);
+        }
+
+        updateChartAndTemperature();
+    </script>
+</body>
+</html>
