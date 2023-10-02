@@ -42,7 +42,7 @@ import json
 import re
 
 from tts import say
-from aiy.board import Board, Led
+from board import Board, Led
 import pyttsx3
 
 import smtplib
