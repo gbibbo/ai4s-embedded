@@ -32,130 +32,163 @@ STEP 6: ACCESS THE WEBPAGE
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grafico de Sonidos</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound confidence graph</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
 </head>
 <body>
-    <div class="header-container">
-        <h1>Sound confidence graph</h1>
-        <h2 id="temperatureDisplay">Temperature: --</h2>
-    </div>
-    <canvas id="soundChart"></canvas>
+<div class="header-container">
+    <img src="logo.png" alt="Project logo" style="height: 60px;">
+    <h1>Sound confidence graph</h1>
+    <h2 id="temperatureDisplay">Temperature: --</h2>
+    <button id="commandButton" onclick="sendCommand()">Start</button>
+</div>
+<canvas id="soundChart"></canvas>
+<script>
+    let chart;
+    let state = 'stop';
 
-    <script>
-        let chart;
+    async function fetchJSONData() {
+        try {
+            const response = await fetch("sound_datalog.json");
+            const jsonData = await response.json();
+            return jsonData;
+        } catch (error) {
+            console.error("Error al cargar el archivo JSON:", error);
+            return [];
+        }
+    }
 
-        async function fetchJSONData() {
-            try {
-                const response = await fetch("sound_datalog.json");
-                const jsonData = await response.json();
-                return jsonData;
-            } catch (error) {
-                console.error("Error al cargar el archivo JSON:", error);
-                return [];
-            }
+    async function fetchTemperatureData() {
+        try {
+            const response = await fetch("temperature_log.json");
+            const jsonData = await response.json();
+            return jsonData;
+        } catch (error) {
+            console.error("Error al cargar el archivo JSON de temperatura:", error);
+            return [];
+        }
+    }
+
+    async function fetchState() {
+        try {
+            const response = await fetch('http://raspberrypi.local:5000/state');
+            const data = await response.json();
+            state = data.state;
+            document.getElementById('commandButton').textContent = state === 'start' ? 'Stop' : 'Start';
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function calculateTotalConfidence(jsonData) {
+        const soundStats = {};
+
+        jsonData.forEach(frame => {
+            frame.sounds.forEach(sound => {
+                if (!soundStats[sound.label]) {
+                    soundStats[sound.label] = { sum: 0, count: 0 };
+                }
+                soundStats[sound.label].sum += sound.confidence;
+                soundStats[sound.label].count += 1;
+            });
+        });
+
+        return Object.entries(soundStats).map(([label, stats]) => {
+            return { label, total: stats.sum };
+        });
+    }
+
+    async function plotSoundData() {
+        const jsonData = await fetchJSONData();
+        console.log(jsonData);
+
+        if (jsonData.length === 0) {
+            console.error("No hay datos disponibles para graficar.");
+            return;
         }
 
-        async function fetchTemperatureData() {
-            try {
-                const response = await fetch("temperature_log.json");
-                const jsonData = await response.json();
-                return jsonData;
-            } catch (error) {
-                console.error("Error al cargar el archivo JSON de temperatura:", error);
-                return [];
-            }
+        const last100Data = jsonData.slice(-100);
+        const labels = last100Data.map(data => data.timestamp);
+        const sortedSoundLabels = calculateTotalConfidence(last100Data).sort((a, b) => b.total - a.total).slice(0, 7).map(entry => entry.label);
+        const datasets = sortedSoundLabels.map(label => {
+            return {
+                label: label,
+                data: last100Data.map(data => {
+                    const sound = data.sounds.find(sound => sound.label === label);
+                    return sound ? sound.confidence : 0;
+                }),
+                borderWidth: 1
+            };
+        });
+
+        const ctx = document.getElementById('soundChart').getContext('2d');
+        if (chart) {
+            chart.destroy();
         }
-
-        function calculateTotalConfidence(jsonData) {
-            const soundStats = {};
-
-            jsonData.forEach(frame => {
-                frame.sounds.forEach(sound => {
-                    if (!soundStats[sound.label]) {
-                        soundStats[sound.label] = { sum: 0, count: 0 };
-                    }
-                    soundStats[sound.label].sum += sound.confidence;
-                    soundStats[sound.label].count += 1;
-                });
-            });
-
-            return Object.entries(soundStats).map(([label, stats]) => {
-                return { label, total: stats.sum };
-            });
-        }
-
-        async function plotSoundData() {
-            const jsonData = await fetchJSONData();
-            console.log(jsonData);
-
-            if (jsonData.length === 0) {
-                console.error("No hay datos disponibles para graficar.");
-                return;
-            }
-
-            const last100Data = jsonData.slice(-100);
-            const labels = last100Data.map(data => data.timestamp);
-            const sortedSoundLabels = calculateTotalConfidence(last100Data).sort((a, b) => b.total - a.total).slice(0, 7).map(entry => entry.label);
-            const datasets = sortedSoundLabels.map(label => {
-                return {
-                    label: label,
-                    data: last100Data.map(data => {
-                        const sound = data.sounds.find(sound => sound.label === label);
-                        return sound ? sound.confidence : 0;
-                    }),
-                    borderWidth: 1
-                };
-            });
-
-            const ctx = document.getElementById('soundChart').getContext('2d');
-            if (chart) {
-                chart.destroy();
-            }
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            });
-        }
-
-        async function updateTemperatureDisplay() {
-            const temperatureData = await fetchTemperatureData();
-            const lastTemperature = temperatureData[temperatureData.length - 1];
-
-            if (lastTemperature) {
-                document.getElementById('temperatureDisplay').textContent = `Temperature: ${lastTemperature.temperature}°C`;
-            } else {
-                document.getElementById('temperatureDisplay').textContent = "Temperature: --";
             }
-        }
+        });
+    }
 
-        async function updateChartAndTemperature() {
-            await plotSoundData();
-            await updateTemperatureDisplay();
-            setTimeout(updateChartAndTemperature, 500);
-        }
+    async function updateTemperatureDisplay() {
+        const temperatureData = await fetchTemperatureData();
+        const lastTemperature = temperatureData[temperatureData.length - 1];
 
-        updateChartAndTemperature();
-    </script>
+        if (lastTemperature) {
+            document.getElementById('temperatureDisplay').textContent = `Temperature: ${lastTemperature.temperature}°C`;
+        } else {
+            document.getElementById('temperatureDisplay').textContent = "Temperature: --";
+        }
+    }
+
+    async function updateChartAndTemperature() {
+	if(state === 'start'){
+        	await plotSoundData();
+	}
+        await updateTemperatureDisplay();
+        await fetchState();
+        setTimeout(updateChartAndTemperature, 1000);
+    }
+
+    updateChartAndTemperature();
+
+    async function sendCommand() {
+        const command = state === 'start' ? 'stop' : 'start';
+        try {
+            const response = await fetch('http://raspberrypi.local:5000/command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ command })
+            });
+            const data = await response.json();
+            console.log(data);
+            await fetchState();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
 </body>
 </html>
