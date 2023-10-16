@@ -38,7 +38,7 @@ def home():
 <button onclick="updateState()">Toggle</button>
 <script>
         function sendCommand(command) {
-            fetch('http://raspberrypi.local:5000/command', { 
+            fetch('http://192.168.0.101:5000/command', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ def home():
             });
         }
         function getState() {
-            return fetch('http://raspberrypi.local:5000/state')
+            return fetch('http://192.168.0.101:5000/state')
             .then(response => response.json())
             .then(data => data.state);
         }
