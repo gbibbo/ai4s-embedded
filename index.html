@@ -1,48 +1,17 @@
-<!-- This file creates a web page that displays the detected sound events and temperature values.
-
-For it to work correctly from the Raspberry Pi with Raspbian installed, follow this steps
-
-STEP 1: UPDATE YOUR SYSTEM
-1. Open Terminal on your Raspberry Pi.
-2. Run the following commands to update your system:
-    sudo apt-get update
-    sudo apt-get upgrade
-
-STEP 2: INSTALL APACHE
-1. Run the following command to install Apache:
-    sudo apt-get install apache2 -y
-
-STEP 3: INSTALL PHP
-1. Run the following command to install PHP:
-    sudo apt-get install php -y
-
-STEP 4: TEST APACHE
-1. Open a web browser and enter your Raspberry Pi's IP address.
-2. If Apache is working correctly, you should see a default Apache page.
-
-STEP 5: LOCATE HTML DIRECTORY
-1. The default directory for your website is /var/www/html. 
-2. You can replace the default file with this index.html file.
-
-STEP 6: ACCESS THE WEBPAGE
-1. You can access the new webpage by entering the Raspberry Pi's IP address in a web browser.
-
--->
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sound confidence graph</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    .header-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound confidence graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
 <div class="header-container">
@@ -135,15 +104,18 @@ STEP 6: ACCESS THE WEBPAGE
             chart.destroy();
         }
         chart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',  // Cambio de 'bar' a 'line'
             data: {
                 labels: labels,
                 datasets: datasets
             },
             options: {
+                animation: {
+                    duration: 0  // Desactiva la animación
+                },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: false
                     }
                 }
             }
@@ -192,3 +164,4 @@ STEP 6: ACCESS THE WEBPAGE
 </script>
 </body>
 </html>
+
