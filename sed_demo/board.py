@@ -73,7 +73,7 @@ from collections import namedtuple
 
 from RPi import GPIO
 
-from leds import Color, Leds, Pattern
+from .leds import Color, Leds, Pattern
 
 class Button:
     """ An interface for the button connected to the AIY board's
