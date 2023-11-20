@@ -41,8 +41,8 @@ import time
 import json
 import re
 
-from tts import say
-from board import Board, Led
+from .tts import say
+from .board import Board, Led
 import pyttsx3
 
 import smtplib
