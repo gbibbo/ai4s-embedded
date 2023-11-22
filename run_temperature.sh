@@ -1,5 +1,5 @@
 # Run temperature.py
-python3 /home/pi/AI4S-demo/temperature.py
+python3 /home/ai4s/ai4s-embedded/temperature.py
 
 
 
