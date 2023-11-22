@@ -47,14 +47,14 @@ sudo chmod 777 /var/www/html/
 # Configuración de scripts de Python para autoinicio
 mkdir -p ~/.config/autostart
 
+sudo chmod +x /home/ai4s/ai4s-embedded/temperature.py
 echo -e "[Desktop Entry]\nType=Application\nName=Run Temperature\nExec=python3 /home/ai4s/ai4s-embedded/temperature.py" > ~/.config/autostart/run_temperature.desktop
-chmod +x /home/ai4s/ai4s-embedded/temperature.py
 
+sudo chmod +x /home/ai4s/ai4s-embedded/run_sed_demo.sh
 echo -e "[Desktop Entry]\nType=Application\nName=Run sed_demo\nExec=/home/ai4s/ai4s-embedded/run_sed_demo.sh" > ~/.config/autostart/run_sed_demo.desktop
-chmod +x /home/ai4s/ai4s-embedded/run_sed_demo.sh
 
+sudo chmod +x /home/ai4s/ai4s-embedded/flask_app.py
 echo -e "[Desktop Entry]\nType=Application\nName=Run Flask\nExec=python3 /home/ai4s/ai4s-embedded/flask_app.py" > ~/.config/autostart/run_flask.desktop
-chmod +x /home/ai4s/ai4s-embedded/flask_app.py
 
 # Mover el logo a la carpeta pública
 sudo mv /home/ai4s/ai4s-embedded/assets/logo.png /var/www/html/logo.png
