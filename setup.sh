@@ -29,7 +29,10 @@ cd ai4s-embedded
 pip3 install --upgrade pip setuptools wheel
 
 # Instalar Flask y dependencias adicionales
-pip3 install Flask Flask-CORS pycairo PyGObject
+pip3 install Flask --break-system-packages
+pip3 install Flask-CORS --break-system-packages
+pip3 install pycairo --break-system-packages
+pip3 install PyGObject --break-system-packages
 
 # Instalar requisitos desde el archivo
 pip3 install -r requirements.txt
