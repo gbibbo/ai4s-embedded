@@ -44,11 +44,6 @@ sudo chown www-data:www-data /var/www/html/index.html
 sudo chmod 644 /var/www/html/index.html
 sudo chmod 777 /var/www/html/
 
-# Verificar si existe el directorio ~/.config/autostart, si no, crearlo
-if [ ! -d "$HOME/.config/autostart" ]; then
-    mkdir -p "$HOME/.config/autostart"
-fi
-
 # Configuración de scripts de Python para autoinicio
 mkdir -p ~/.config/autostart
 
