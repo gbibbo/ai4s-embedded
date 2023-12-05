@@ -8,7 +8,7 @@ echo "Script started at $(date)" >> /home/ai4s/ai4s-embedded/sed_demo.log
 cd /home/ai4s/ai4s-embedded
 
 # Run sed_demo and log the output and errors
-python3 -m sed_demo MODEL_PATH='Cnn9_GMP_64x64_300000_iterations_mAP=0.37.pth?download=1' >> /home/ai4s/ai4s-embedded/sed_demo.log 2>&1
+python3 -m sed_demo MODEL_PATH='Cnn9_GMP_64x64_300000_iterations_mAP=0.37.pth?download=1' # >> /home/ai4s/ai4s-embedded/sed_demo.log 2>&1
 
 
 # Luego, hay que hacer lo siguiente
