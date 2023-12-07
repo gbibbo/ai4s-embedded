@@ -15,6 +15,7 @@ sudo apt-get install -y build-essential libssl-dev libffi-dev python3-dev libcai
 sudo apt install python3-torch
 sudo apt install python3-omegaconf
 sudo apt install python3-pyaudio
+sudo apt-get install python3-flask-cors
 pip3 install --upgrade pip --break-system-packages
 pip3 install librosa --break-system-packages
 pip3 install pyttsx3 --break-system-packages
@@ -51,14 +52,14 @@ sudo chmod -R 775 /var/www/html/
 mkdir -p ~/.config/autostart
 
 # Copiar y dar permisos de ejecución a los scripts
-sudo cp temperature.py run_sed_demo.sh flask_app.py /usr/local/bin/
-sudo chown ai4s:ai4s /usr/local/bin/temperature.py /usr/local/bin/run_sed_demo.sh /usr/local/bin/flask_app.py
-sudo chmod +x /usr/local/bin/temperature.py /usr/local/bin/run_sed_demo.sh /usr/local/bin/flask_app.py
+# sudo cp temperature.py run_sed_demo.sh flask_app.py /usr/local/bin/
+sudo chown ai4s:ai4s /home/ai4s/ai4s-embedded/temperature.py /home/ai4s/ai4s-embedded/run_sed_demo.sh /home/ai4s/ai4s-embedded/flask_app.py
+sudo chmod +x /home/ai4s/ai4s-embedded/temperature.py /home/ai4s/ai4s-embedded/run_sed_demo.sh /home/ai4s/ai4s-embedded/flask_app.py
 
 # Crear archivos de autoinicio
-echo -e "[Desktop Entry]\nType=Application\nName=Run Temperature\nExec=python3 /usr/local/bin/temperature.py" > ~/.config/autostart/run_temperature.desktop
-echo -e "[Desktop Entry]\nType=Application\nName=Run sed_demo\nExec=/usr/local/bin/run_sed_demo.sh" > ~/.config/autostart/run_sed_demo.desktop
-echo -e "[Desktop Entry]\nType=Application\nName=Run Flask\nExec=python3 /usr/local/bin/flask_app.py" > ~/.config/autostart/run_flask.desktop
+echo -e "[Desktop Entry]\nType=Application\nName=Run Temperature\nExec=python3 /home/ai4s/ai4s-embedded/temperature.py" > ~/.config/autostart/run_temperature.desktop
+echo -e "[Desktop Entry]\nType=Application\nName=Run sed_demo\nExec=/home/ai4s/ai4s-embedded/run_sed_demo.sh" > ~/.config/autostart/run_sed_demo.desktop
+echo -e "[Desktop Entry]\nType=Application\nName=Run Flask\nExec=python3 /home/ai4s/ai4s-embedded/flask_app.py" > ~/.config/autostart/run_flask.desktop
 
 # Ajustar la propiedad y permisos de los archivos de autoinicio
 sudo chown ai4s:ai4s ~/.config/autostart/run_temperature.desktop ~/.config/autostart/run_sed_demo.desktop ~/.config/autostart/run_flask.desktop
