@@ -79,6 +79,7 @@ class DemoApp(DemoFrontend):
     email_sender = 'ai4sound.test@gmail.com'
     email_receiver = 'ai4sound.test@gmail.com'
     email_sender_pass = 'fazblwlyhermslps'
+    state_file = 'state.json'
                             
 
     def __init__(
@@ -174,6 +175,8 @@ class DemoApp(DemoFrontend):
             engine.runAndWait()
             # Turn on the LED on the device
             self._board.led.state = Led.ON
+            with open(self.state_file, 'w') as f:
+                json.dump({'state': 'stop'}, f)
         else:
             # If a recording is not running, print "Stop Recording" to the console
             print("Stop Recording")
@@ -183,6 +186,8 @@ class DemoApp(DemoFrontend):
             engine.runAndWait()
             # Turn off the LED on the device
             self._board.led.state = Led.OFF
+            with open(self.state_file, 'w') as f:
+                json.dump({'state': 'start'}, f)
 
             
     def process_and_save_data(self, value):
@@ -287,6 +292,8 @@ class DemoApp(DemoFrontend):
         self.thread.daemon = True
         self.thread.start()  # will end automatically if is_running=False
         self._board.led.state = Led.ON
+        with open(self.state_file, 'w') as f:
+            json.dump({'state': 'stop'}, f)
 
     def stop(self):
         """
@@ -298,6 +305,8 @@ class DemoApp(DemoFrontend):
         # Here we only need to stop the audio stream.
         self.audiostream.stop()
         self._board.led.state = Led.OFF
+        with open(self.state_file, 'w') as f:
+            json.dump({'state': 'start'}, f)
 
     def exit_demo(self):
         """
