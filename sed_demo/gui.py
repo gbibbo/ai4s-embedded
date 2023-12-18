@@ -12,6 +12,7 @@ but no actual functionality behind them).
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
+import json
 
 
 # ##############################################################################
@@ -128,6 +129,7 @@ class DemoFrontend(tk.Tk):
     BAR_STYLE = "bar.Horizontal.TProgressbar"
     BAR_COLOR = "#aaaaff"
     BAR_BG_COLOR = "#aaffaa"
+    state_file = 'state.json'
 
     def __init__(self, top_k, top_banner_path, logo_paths=[],
                  max_top_banner_h=120, max_logos_h=35, margin=20,
@@ -315,8 +317,12 @@ class DemoFrontend(tk.Tk):
         self.toggle_start()
         if was_running:
             self.stop()
+            with open(self.state_file, 'w') as f:
+                json.dump({'state': 'stop'}, f)
         else:
             self.start()
+            with open(self.state_file, 'w') as f:
+                json.dump({'state': 'start'}, f)
 
     def start(self):
         """
